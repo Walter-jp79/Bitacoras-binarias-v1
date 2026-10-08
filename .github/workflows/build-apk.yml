@@ -1,0 +1,39 @@
+name: Generar APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Extraer proyecto
+        run: |
+          unzip -o Bitacora_Binarias_Android_V1_Listo.zip -d proyecto
+          cd proyecto
+          find . -maxdepth 2 -type f
+
+      - name: Instalar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.2'
+
+      - name: Compilar APK
+        working-directory: proyecto
+        run: gradle assembleDebug --no-daemon
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Bitacora-Binarias-V1-APK
+          path: proyecto/app/build/outputs/apk/debug/app-debug.apk
